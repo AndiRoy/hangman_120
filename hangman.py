@@ -1,5 +1,6 @@
 '''
 HANGMAN
+
 '''
 import pygame
 import random
@@ -26,7 +27,7 @@ guessed = []
 #couldn't figure out a better way to do this, had to paste each path
 hangmanPics = [pygame.image.load('C:/Users/drea1/CSE 120 HW/Hangman/Hangman0.png'), 
                pygame.image.load('C:/Users/drea1/CSE 120 HW/Hangman/Hangman1.png'), 
-               pygame.image.load('C:/Users/drea1/CSE 120 HW/Hangman\Hangman2.png'), 
+               pygame.image.load('C:/Users/drea1/CSE 120 HW/Hangman/Hangman2.png'), 
                pygame.image.load('C:/Users/drea1/CSE 120 HW/Hangman/Hangman3.png'), 
                pygame.image.load('C:/Users/drea1/CSE 120 HW/Hangman/Hangman4.png'), 
                pygame.image.load('C:/Users/drea1/CSE 120 HW/Hangman/Hangman5.png'), 
