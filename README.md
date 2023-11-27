@@ -1,5 +1,6 @@
 # hangman_120
 Coding project for CSE 120/Hangman
+
 I have made very few little changes for a while, where I had stopped on the project, was after trying to 
 implement a difficulty menu for the user to choose which one they would like, but you can see when running the code
 that theres an issue where it just displays the 'Easy' box on the whole screen. Also keep in mind we need
