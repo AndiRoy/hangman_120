@@ -46,11 +46,10 @@ def redraw_game_window():
     global guessed
     global hangmanStatus
     global limbs
-    screen.fill(WHITE)
     # Buttons
     for i in range(len(buttons)):
         if buttons[i][4]:
-            pygame.draw.circle(screen, BLACK, (buttons[i][1], buttons[i][2]), buttons[i][3])
+            pygame.draw.circle(screen, WHITE, (buttons[i][1], buttons[i][2]), buttons[i][3])
             pygame.draw.circle(screen, buttons[i][0], (buttons[i][1], buttons[i][2]), buttons[i][3] - 2
                                )
             label = btn_font.render(chr(buttons[i][5]), 1, BLACK)
@@ -64,7 +63,7 @@ def redraw_game_window():
     screen.blit(label1,(SCREEN_WIDTH/2 - length/2, 400))
 
     pic = hangmanStatus[limbs]
-    screen.blit(pic, (SCREEN_WIDTH/2 - pic.get_width()/2 + 20, 150))
+    screen.blit(pic, (SCREEN_WIDTH/2 - pic.get_width()/2 + 20, 50))
     pygame.display.update()
 
 def spacedOut(word, guessed=[]):
@@ -110,6 +109,8 @@ def play_game():
 
     reset()
 
+    clock = pygame.time.Clock()
+
     while True:
         redraw_game_window()
         pygame.time.delay(10)
@@ -117,12 +118,38 @@ def play_game():
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
-                pygame.quit()
+                True
                 quit()
-
-        # Your game logic goes here
-
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_ESCAPE:
+                    play_game()
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                clickPos = pygame.mouse.get_pos()
+                letter = buttonHit(clickPos[0], clickPos[1])
+                if letter is not None:
+                    guessed.append(chr(letter))
+                    buttons[letter - 65][4] = False
+                if hang(str(chr(letter))):
+                    if limbs != 5:
+                        limbs += 1
+                    else:
+                        end()
+                else:
+                    print(spacedOut(word, guessed))
+                    if spacedOut(word, guessed).count('_') == 0:
+                        end(True)
+        
+        redraw_game_window()
+        pygame.time.delay(10)
         pygame.display.update()
+
+        clock.tick(10)
+        
+
+
+            
+
+        
 
 # Helper functions (spacedOut, randomWord, buttonHit, end, reset, hang) go here
 def spacedOut(word, guessed=[]):
@@ -202,9 +229,23 @@ def hang(guess):
         return True
     else:
         return False
+# Setup buttons
+increase = round(SCREEN_WIDTH / 13)
+for i in range(26):
+    if i < 13:
+        y = 40
+        x = 25 + (increase * i)
+    else:
+        x = 25 + (increase * (i - 13))
+        y = 85
+    buttons.append([LIGHT_GRAY, x, y, 20, True, 65 + i])
+    # buttons.append([color, x_pos, y_pos, radius, visible, char])
+
 # Main loop
 while True:
     action = menu()
 
     if action == "start":
         play_game()
+
+
