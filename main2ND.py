@@ -26,6 +26,10 @@ lost_font = pygame.font.SysFont('arial', 45)
 word = ''
 buttons = []
 guessed = []
+limbs = 0
+guesses_left = 6
+
+#images for hangman 
 hangmanStatus = [pygame.image.load("C:/Users/drea1/OneDrive/Documents/120Hangman/testing 120/hangman0.png"),
                  pygame.image.load("C:/Users/drea1/OneDrive/Documents/120Hangman/testing 120/hangman1.png"),
                  pygame.image.load("C:/Users/drea1/OneDrive/Documents/120Hangman/testing 120/hangman2.png"),
@@ -34,18 +38,24 @@ hangmanStatus = [pygame.image.load("C:/Users/drea1/OneDrive/Documents/120Hangman
                  pygame.image.load("C:/Users/drea1/OneDrive/Documents/120Hangman/testing 120/hangman5.png"),
                  pygame.image.load("C:/Users/drea1/OneDrive/Documents/120Hangman/testing 120/hangman6.png")]
 
-limbs = 0
 
-# Load button images
+
+# images for buttons/backgrounds/other assets
 title_img = pygame.image.load("C:/Users/drea1/OneDrive/Documents/120Hangman/testing 120/TITLE.png")
 start_img = pygame.image.load("C:/Users/drea1/OneDrive/Documents/120Hangman/testing 120/STARTBU.png")
 exit_img = pygame.image.load("C:/Users/drea1/OneDrive/Documents/120Hangman/testing 120/EXITBU.png")
 
+backMenu_img = pygame.image.load("C:/Users/drea1/OneDrive/Documents/120Hangman/testing 120/backgroundmenu.png")
 
 def redraw_game_window():
     global guessed
     global hangmanStatus
     global limbs
+    global guesses_left
+
+    guesses_label = guess_font.render(f"Guesses left: {guesses_left}", 1, BLACK)
+    screen.blit(guesses_label, (10,450))
+
     # Buttons
     for i in range(len(buttons)):
         if buttons[i][4]:
@@ -91,7 +101,7 @@ def menu():
                 pygame.quit()
                 quit()
 
-        screen.fill((202, 228, 241))
+        screen.blit(backMenu_img,(0,0))
         screen.blit(title_img, (25, 100))
 
         if start_button.draw(screen):
@@ -105,7 +115,7 @@ def menu():
 
 # Main game function
 def play_game():
-    global word, buttons, guessed, limbs
+    global word, buttons, guessed, limbs, guesses_left, wrong
 
     reset()
 
@@ -118,7 +128,6 @@ def play_game():
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
-                True
                 quit()
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_ESCAPE:
@@ -129,11 +138,13 @@ def play_game():
                 if letter is not None:
                     guessed.append(chr(letter))
                     buttons[letter - 65][4] = False
-                if hang(str(chr(letter))):
-                    if limbs != 5:
-                        limbs += 1
-                    else:
-                        end()
+                    if hang(str(chr(letter))):
+                        if limbs != 5:
+                            limbs += 1
+                            guesses_left -= 1
+                            printguesses(guesses_left)
+                        else:
+                            end()
                 else:
                     print(spacedOut(word, guessed))
                     if spacedOut(word, guessed).count('_') == 0:
@@ -144,14 +155,14 @@ def play_game():
         pygame.display.update()
 
         clock.tick(10)
-        
 
-
-            
-
-        
-
-# Helper functions (spacedOut, randomWord, buttonHit, end, reset, hang) go here
+#to be used in play(), tells user how many guesses they have left
+def printguesses(guesses_left):
+    wrongGu_label = guess_font.render(f"Wrong Letter! You have {guesses_left} guesses left", 1, BLACK)
+    screen.blit(wrongGu_label, (600, 450))
+    
+    
+    
 def spacedOut(word, guessed=[]):
     spacedWord = ''
     guessedLetters = guessed
@@ -182,16 +193,15 @@ def buttonHit(x, y):
 
 def end(winner=False):
     global limbs
-    lostTxt = 'You Lost, press any key to play again...'
-    winTxt = 'WINNER!, press any key to play again...'
+    
     redraw_game_window()
     pygame.time.delay(1000)
-    screen.fill(WHITE)
-
+    screen.fill(LIGHT_GRAY)
+    
     if winner == True:
-        label = lost_font.render(winTxt, 1, BLACK)
+        label = lost_font.render("WINNER", 1, BLACK)
     else:
-        label = lost_font.render(lostTxt, 1, BLACK)
+        label = lost_font.render("You Lost!", 1, BLACK)
 
     wordTxt = lost_font.render(word.upper(), 1, BLACK)
     wordWas = lost_font.render('The phrase was: ', 1, BLACK)
