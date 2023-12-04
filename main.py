@@ -83,6 +83,11 @@ def redraw_game_window():
     bodImg = hangmanStatus[limbs]
     screen.blit(bodImg, (SCREEN_WIDTH/2 - bodImg.get_width()/2 - 18, 80))
 
+    #instead of giving it exact coords, takes the width of the screen/2, then half of the width 
+    #of the loaded png image, (bod.Img.get_width) gets the width, then the whole thing takes these
+    #two calculations and subtracts 18, to position it to the left(x coord) , 80 is the y coord
+    #so that it is positioned in the center basically, with a few tweaks based on the hangman img sizing
+
     if wrongPush and pygame.time.get_ticks() - wrongPush_time < 500:
         printguesses()
     
@@ -103,7 +108,7 @@ def spaceCount(word, guessed=[]):
             spacedWord += ' '
     return spacedWord
 
-#buttonds for menu  
+#buttons for menu  
 start_button = button.Button(SCREEN_WIDTH / 4 - start_img.get_width() / 2 + 300, 350, start_img, .5)
 exit_button = button.Button(3 * SCREEN_WIDTH / 4 - exit_img.get_width() / 2 + 300 , 350, exit_img, .5)
 
@@ -136,31 +141,33 @@ def play_game():
     clock = pygame.time.Clock()
 
     while True:
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
+        for event in pygame.event.get(): #iterates over all events, outside loop/mouse movement, button clicks, etc
+            if event.type == pygame.QUIT: #quits game if user clicks out
                 quit()
-            if event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_ESCAPE:
+            if event.type == pygame.KEYDOWN: #if keyboard is pressed
+                if event.key == pygame.K_ESCAPE: 
                     play_game()
-            if event.type == pygame.MOUSEBUTTONDOWN:
-                clickPos = pygame.mouse.get_pos()
-                letter = buttonHit(clickPos[0], clickPos[1])
-                if letter is not None:
-                    guessed.append(chr(letter))
+            if event.type == pygame.MOUSEBUTTONDOWN: #if user clicks
+                clickPos = pygame.mouse.get_pos()   #gets (x,y) position where mouse is clicked
+                letter = buttonHit(clickPos[0], clickPos[1]) #sees if button(letter) is hit
+                if letter is not None:  #if one IS hit, it appends that to the letters guessed
+                    guessed.append(chr(letter))   
                     buttons[letter - 65][4] = False
-                    if hang(str(chr(letter))):
+                    if hang(str(chr(letter))):  #hang is called to determine if a letter is wrong, and decrements the guesses left
                         if limbs < 6:
-                            limbs += 1
+                            limbs += 1 
                             guesses_left -= 1
-                            wrongPush = True
+                            wrongPush = True #if a wrong button is clicked, it tells the user it was incorrect
                             wrongPush_time = pygame.time.get_ticks()
                             printguesses()
                         else:
-                            end()
+                            end() #winner == false
                 else:
-                    print(spaceCount(word, guessed))
-                    if spaceCount(word, guessed).count('_') == 0:
-                        end(True)
+                    print(spaceCount(word, guessed))  #current state of word
+                    if spaceCount(word, guessed).count('_') == 0: #if there are no underscores, all letters have been guessed correct
+                        end(True) #if woord is guessed correctly
+        
+
             
         
         screen.fill((GREEN))
@@ -176,22 +183,7 @@ def printguesses():
     screen.blit(wrongGu_label, (700, 260))
     pygame.display.update()
     
-    
-    
-def spaceCount(word, guessed=[]):
-    spacedWord = ''
-    guessedLetters = guessed
-    for x in range(len(word)):
-        if word[x] != ' ':
-            spacedWord += '_ '
-            for i in range(len(guessedLetters)):
-                if word[x].upper() == guessedLetters[i]:
-                    spacedWord = spacedWord[:-2]
-                    spacedWord += word[x].upper() + ' '
-        elif word[x] == ' ':
-            spacedWord += ' '
-    return spacedWord
-
+#word to be guessed in game 
 def validWord():
     file = open("C:/Users/drea1/OneDrive/Documents/120Hangman/testing 120/words.txt")
     f = file.readlines()
@@ -206,11 +198,11 @@ def buttonHit(x, y):
                 return buttons[i][5]
     return None
 
+#results, and what displays if they win/lose
 def end(winner=False):
     global limbs
     
     
-
     if winner == True:
         label = Resfont.render("You Won!", 1, BLACK)
     else:
@@ -232,7 +224,8 @@ def end(winner=False):
 
     
     userKey()
-    
+
+#play again    
 def userKey():
     pause = True
     while pause:
@@ -248,7 +241,7 @@ def userKey():
                     quit()
     reset()
     
-
+#resets all variables to play again
 def reset():
     global limbs
     global guessed
@@ -264,13 +257,15 @@ def reset():
     word = validWord()
     guesses_left = 6
     
-
+#determines status of game, win/lose 
 def hang(guess):
     global word
     if guess.lower() not in word.lower():
         return True
     else:
         return False
+
+
 # Setup buttons
 increase = round(SCREEN_WIDTH / 12)
 button_radius = 30
